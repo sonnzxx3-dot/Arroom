@@ -2,6 +2,7 @@ package com.arroom.characters.ui
 
 import android.net.Uri
 import android.view.HapticFeedbackConstants
+import android.view.MotionEvent
 import android.widget.Toast
 import androidx.annotation.StringRes
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -41,6 +42,8 @@ import com.arroom.characters.util.shareMedia
 import com.arroom.characters.util.saveToGallery
 import com.google.ar.core.Config
 import com.google.ar.core.Frame
+import com.google.ar.core.Plane
+import com.google.ar.core.TrackingState
 import com.google.ar.core.TrackingFailureReason
 import io.github.sceneview.ar.ARScene
 import io.github.sceneview.ar.ARSceneView
@@ -54,6 +57,7 @@ import io.github.sceneview.rememberEngine
 import io.github.sceneview.rememberMaterialLoader
 import io.github.sceneview.rememberModelLoader
 import io.github.sceneview.rememberNodes
+import io.github.sceneview.rememberOnGestureListener
 import io.github.sceneview.rememberView
 import kotlinx.coroutines.launch
 
@@ -69,7 +73,6 @@ fun ArScreen() {
     val thermalLevel by rememberThermalLevel()
     val catalogRepo = remember { CatalogRepository(context) }
 
-    // --- Filament / ARCore ---
     val engine = rememberEngine()
     val modelLoader = rememberModelLoader(engine)
     val materialLoader = rememberMaterialLoader(engine)
@@ -78,7 +81,6 @@ fun ArScreen() {
     val collisionSystem = rememberCollisionSystem(view)
     val childNodes = rememberNodes()
 
-    // --- Состояние UI ---
     var arSceneView by remember { mutableStateOf<ARSceneView?>(null) }
     var frame by remember { mutableStateOf<Frame?>(null) }
     var trackingFailure by remember { mutableStateOf<TrackingFailureReason?>(null) }
@@ -94,7 +96,6 @@ fun ArScreen() {
     var modelToDelete by remember { mutableStateOf<CharacterItem?>(null) }
     var showCoach by remember { mutableStateOf(false) }
     var loadProgress by remember { mutableStateOf<Float?>(null) }
-    // Счётчик заставляет карусель перечитать миниатюры после съёмки новой
     var thumbVersion by remember { mutableIntStateOf(0) }
     var thermalWarned by remember { mutableStateOf(false) }
 
@@ -109,7 +110,6 @@ fun ArScreen() {
     fun toast(@StringRes res: Int) = toast(context.getString(res))
     fun haptic() = hostView.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY)
 
-    // Каталог с сервера подтягивается в фоне и не блокирует старт камеры
     LaunchedEffect(Unit) {
         val remote = catalogRepo.load()
         val imported = modelStore.loadImported()
@@ -120,8 +120,6 @@ fun ArScreen() {
         }
     }
 
-    // Пути к миниатюрам перечитываются только при смене каталога или после
-    // съёмки новой — не на каждой перерисовке карусели
     val thumbnailPaths = remember(catalog, thumbVersion) {
         catalog.associate { it.id to thumbnails.pathFor(it.id) }
     }
@@ -136,24 +134,18 @@ fun ArScreen() {
         }
     }
 
-    // Нагрев: понижаем качество теней на лету и предупреждаем человека,
-    // чтобы падение картинки не выглядело поломкой
     LaunchedEffect(thermalLevel) {
         arSceneView?.let { RenderQuality.apply(it.view, highEnd = thermalLevel == ThermalLevel.NORMAL) }
-        // Предупреждаем один раз за сессию: статус скачет туда-сюда,
-        // и повторяющийся тост раздражал бы сильнее самого троттлинга
         if (thermalLevel != ThermalLevel.NORMAL && !thermalWarned) {
             thermalWarned = true
             toast(R.string.thermal_throttled)
         }
     }
 
-    // Во время записи интерфейс уезжает, чтобы не попасть в кадр
     LaunchedEffect(recorder.isRecording) {
         uiVisible = !recorder.isRecording
     }
 
-    // --- Импорт модели из памяти телефона ---
     val importLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.OpenDocument()
     ) { uri ->
@@ -168,8 +160,6 @@ fun ArScreen() {
                     selectedItem = result.item
                     toast(context.getString(R.string.toast_import_ok, result.item.title))
                 }
-                // Причина отказа конкретная: слишком большой файл, не glTF
-                // или Draco-сжатие. Человек понимает, что чинить.
                 is ImportResult.Failure -> toast(
                     result.arg?.let { context.getString(result.messageRes, it) }
                         ?: context.getString(result.messageRes)
@@ -178,7 +168,6 @@ fun ArScreen() {
         }
     }
 
-    // --- Размещение персонажа по тапу ---
     fun placeAt(x: Float, y: Float) {
         val currentFrame = frame ?: return
         if (isLoading) return
@@ -192,8 +181,6 @@ fun ArScreen() {
             .hitTest(px, py)
             .firstOrNull { it.isValid(depthPoint = false, point = false) }
 
-        // Если человек промахнулся мимо распознанной плоскости, пробуем точку
-        // под прицелом: там поверхность точно есть, раз прицел горит.
         val v = arSceneView
         val anchor = (hitAt(x, y)
             ?: v?.let { hitAt(it.width / 2f, it.height / 2f) })
@@ -206,8 +193,6 @@ fun ArScreen() {
         scope.launch {
             isLoading = true
 
-            // Удалённые модели сначала кладём на диск: повторное размещение
-            // и следующий запуск обходятся без сети совсем.
             val location = when (val source = item.source) {
                 is ModelSource.Remote -> {
                     if (!downloader.isCached(source.url)) loadProgress = 0f
@@ -248,9 +233,6 @@ fun ArScreen() {
             placedCount = childNodes.size
             showPlanes = false
 
-            // Первое размещение — заодно снимаем миниатюру для карусели.
-            // Ждём, пока доиграет пружинка появления, иначе в кадр
-            // попадёт персонаж размером с точку.
             if (!thumbnails.has(item.id)) {
                 scope.launch {
                     kotlinx.coroutines.delay(1100)
@@ -275,9 +257,6 @@ fun ArScreen() {
             val character = node.childNodes.firstOrNull() as? CharacterNode
             character?.animateDisappearance()
             childNodes.remove(node)
-            // Порядок важен: сначала гасим анимации и отдаём меши,
-            // потом убиваем якорь, иначе ARCore освободит позицию
-            // под ещё живой нодой
             character?.dispose()
             (node as? AnchorNode)?.destroy()
             placedCount = childNodes.size
@@ -288,8 +267,6 @@ fun ArScreen() {
         }
     }
 
-    // Уход с экрана или смерть процесса: нативная память Filament
-    // сборщиком мусора Kotlin не освобождается
     DisposableEffect(Unit) {
         onDispose {
             childNodes.forEach { node ->
@@ -303,87 +280,81 @@ fun ArScreen() {
     Box(Modifier.fillMaxSize()) {
 
         key(sessionKey) {
-        ARScene(
-            modifier = Modifier.fillMaxSize(),
-            childNodes = childNodes,
-            engine = engine,
-            view = view,
-            modelLoader = modelLoader,
-            materialLoader = materialLoader,
-            collisionSystem = collisionSystem,
-            cameraNode = cameraNode,
-            planeRenderer = showPlanes,
-            sessionConfiguration = { session, config ->
-                // Глубина: персонаж корректно прячется за мебелью
-                config.depthMode =
-                    if (session.isDepthModeSupported(Config.DepthMode.AUTOMATIC))
-                        Config.DepthMode.AUTOMATIC
-                    else Config.DepthMode.DISABLED
+            ARScene(
+                modifier = Modifier.fillMaxSize(),
+                childNodes = childNodes,
+                engine = engine,
+                view = view,
+                modelLoader = modelLoader,
+                materialLoader = materialLoader,
+                collisionSystem = collisionSystem,
+                cameraNode = cameraNode,
+                planeRenderer = showPlanes,
+                sessionConfiguration = { session, config ->
+                    config.depthMode =
+                        if (session.isDepthModeSupported(Config.DepthMode.AUTOMATIC))
+                            Config.DepthMode.AUTOMATIC
+                        else Config.DepthMode.DISABLED
 
-                // Реалистичный свет: модель подстраивается под освещение комнаты
-                config.lightEstimationMode = Config.LightEstimationMode.ENVIRONMENTAL_HDR
+                    config.lightEstimationMode = Config.LightEstimationMode.ENVIRONMENTAL_HDR
+                    config.planeFindingMode = Config.PlaneFindingMode.HORIZONTAL_AND_VERTICAL
+                    config.instantPlacementMode = Config.InstantPlacementMode.DISABLED
+                },
+                onViewCreated = {
+                    arSceneView = this
+                    RenderQuality.apply(view, highEnd = thermalLevel == ThermalLevel.NORMAL)
+                },
+                onSessionFailed = { e ->
+                    sessionError = e.message ?: context.getString(R.string.session_error_generic)
+                },
+                onSessionUpdated = { _, updatedFrame ->
+                    frame = updatedFrame
+                    if (!planesFound) {
+                        planesFound = updatedFrame
+                            .getUpdatedTrackables(Plane::class.java)
+                            .any { it.trackingState == TrackingState.TRACKING }
+                    }
 
-                config.planeFindingMode = Config.PlaneFindingMode.HORIZONTAL_AND_VERTICAL
-                config.instantPlacementMode = Config.InstantPlacementMode.DISABLED
-            },
-            onViewCreated = {
-                arSceneView = this
-                RenderQuality.apply(view, highEnd = thermalLevel == ThermalLevel.NORMAL)
-            },
-            onSessionFailed = { e ->
-                sessionError = e.message ?: context.getString(R.string.session_error_generic)
-            },
-            onSessionUpdated = { _, updatedFrame ->
-                frame = updatedFrame
-                if (!planesFound) {
-                    planesFound = updatedFrame.getUpdatedPlanes().isNotEmpty()
-                }
-
-                // Прицел: проверяем центр экрана каждый кадр, но состояние
-                // трогаем только при реальном изменении — иначе Compose
-                // будет перерисовывать оверлей 30 раз в секунду впустую.
-                val v = arSceneView
-                if (v != null && v.width > 0 && v.height > 0) {
-                    val hit = updatedFrame
-                        .hitTest(v.width / 2f, v.height / 2f)
-                        .firstOrNull { it.isValid(depthPoint = false, point = false) }
-                    val nowCanPlace = hit != null
-                    if (nowCanPlace != canPlace) canPlace = nowCanPlace
-                    val d = hit?.distance
-                    if (d != null && (hitDistance == null ||
-                            kotlin.math.abs(d - hitDistance!!) > 0.1f)
-                    ) hitDistance = d
-                    if (d == null && hitDistance != null) hitDistance = null
-                }
-            },
-            onTrackingFailureChanged = { trackingFailure = it },
-            onGestureListener = io.github.sceneview.gesture.rememberOnGestureListener(
-                onSingleTapConfirmed = { motionEvent, node: Node? ->
-                    val tapped = node?.let { findCharacter(it) }
-                    if (tapped != null) {
-                        activeCharacter?.setSelected(false)
-                        tapped.setSelected(true)
-                        tapped.pulse(scope)
-                        activeCharacter = tapped
-                        haptic()
-                    } else {
-                        placeAt(motionEvent.x, motionEvent.y)
+                    val v = arSceneView
+                    if (v != null && v.width > 0 && v.height > 0) {
+                        val hit = updatedFrame
+                            .hitTest(v.width / 2f, v.height / 2f)
+                            .firstOrNull { it.isValid(depthPoint = false, point = false) }
+                        val nowCanPlace = hit != null
+                        if (nowCanPlace != canPlace) canPlace = nowCanPlace
+                        val d = hit?.distance
+                        if (d != null && (hitDistance == null ||
+                                kotlin.math.abs(d - hitDistance!!) > 0.1f)
+                        ) hitDistance = d
+                        if (d == null && hitDistance != null) hitDistance = null
                     }
                 },
-                onLongPress = { _, node: Node? ->
-                    // Долгое нажатие по персонажу — убрать именно его
-                    val target = node?.let { findCharacter(it) } ?: return@rememberOnGestureListener
-                    val anchorNode = childNodes.firstOrNull { it.childNodes.contains(target) }
-                    if (anchorNode != null) {
-                        haptic()
-                        removeNode(anchorNode)
+                onTrackingFailureChanged = { trackingFailure = it },
+                onGestureListener = rememberOnGestureListener(
+                    onSingleTapConfirmed = { motionEvent: MotionEvent, node: Node? ->
+                        val tapped = node?.let { findCharacter(it) }
+                        if (tapped != null) {
+                            activeCharacter?.setSelected(false)
+                            tapped.setSelected(true)
+                            tapped.pulse(scope)
+                            activeCharacter = tapped
+                            haptic()
+                        } else {
+                            placeAt(motionEvent.x, motionEvent.y)
+                        }
+                    },
+                    onLongPress = { _: MotionEvent, node: Node? ->
+                        val target = node?.let { findCharacter(it) }
+                            ?: return@rememberOnGestureListener
+                        val anchorNode = childNodes.firstOrNull { it.childNodes.contains(target) }
+                        if (anchorNode != null) {
+                            haptic()
+                            removeNode(anchorNode)
+                        }
                     }
-                }
+                )
             )
-        )
         }
-
-        // ---------- Оверлей ----------
 
         AnimatedVisibility(
             visible = uiVisible && !isLoading &&
@@ -440,45 +411,51 @@ fun ArScreen() {
                 .align(Alignment.BottomCenter)
                 .navigationBarsPadding()
         ) {
-        ControlPanel(
-            catalog = catalog,
-            selected = selectedItem,
-            onSelect = { selectedItem = it },
-            onLongPressImported = { modelToDelete = it },
-            thumbnailFor = { item -> thumbnailPaths[item.id] },
-            onImportClick = {
-                importLauncher.launch(
-                    arrayOf("model/gltf-binary", "model/gltf+json", "application/octet-stream", "*/*")
-                )
-            },
-            activeCharacter = activeCharacter,
-            onSwitchAnimation = { index -> activeCharacter?.playAnimation(index) },
-            canUndo = placedCount > 0,
-            onUndo = { childNodes.lastOrNull()?.let { removeNode(it) } },
-            onClearAll = {
-                childNodes.toList().forEach { removeNode(it) }
-            },
-            isRecording = recorder.isRecording,
-            onToggleRecord = recorder.toggle,
-            onCapture = {
-                val v = arSceneView ?: return@ControlPanel
-                scope.launch {
-                    val bmp = captureArView(v)
-                    if (bmp == null) {
-                        toast(R.string.toast_photo_failed)
-                    } else {
-                        haptic()
-                        val uri = saveToGallery(context, bmp)
-                        toast(if (uri != null) R.string.toast_photo_saved else R.string.toast_save_error)
-                        if (uri != null) pendingShare = uri to "image/jpeg"
+            ControlPanel(
+                catalog = catalog,
+                selected = selectedItem,
+                onSelect = { selectedItem = it },
+                onLongPressImported = { modelToDelete = it },
+                thumbnailFor = { item -> thumbnailPaths[item.id] },
+                onImportClick = {
+                    importLauncher.launch(
+                        arrayOf(
+                            "model/gltf-binary",
+                            "model/gltf+json",
+                            "application/octet-stream",
+                            "*/*"
+                        )
+                    )
+                },
+                activeCharacter = activeCharacter,
+                onSwitchAnimation = { index -> activeCharacter?.playAnimation(index) },
+                canUndo = placedCount > 0,
+                onUndo = { childNodes.lastOrNull()?.let { removeNode(it) } },
+                onClearAll = {
+                    childNodes.toList().forEach { removeNode(it) }
+                },
+                isRecording = recorder.isRecording,
+                onToggleRecord = recorder.toggle,
+                onCapture = {
+                    val v = arSceneView ?: return@ControlPanel
+                    scope.launch {
+                        val bmp = captureArView(v)
+                        if (bmp == null) {
+                            toast(R.string.toast_photo_failed)
+                        } else {
+                            haptic()
+                            val uri = saveToGallery(context, bmp)
+                            toast(
+                                if (uri != null) R.string.toast_photo_saved
+                                else R.string.toast_save_error
+                            )
+                            if (uri != null) pendingShare = uri to "image/jpeg"
+                        }
                     }
-                }
-            },
-        )
+                },
+            )
         }
 
-        // Панель уезжает на время записи — иначе интерфейс попадёт в видео.
-        // Вернуть её можно кнопкой, не прерывая запись.
         AnimatedVisibility(
             visible = !uiVisible,
             enter = fadeIn(),
@@ -506,7 +483,6 @@ fun ArScreen() {
             })
         }
 
-        // Плашка сама уезжает: постоянно висящая кнопка мешает следующему кадру
         LaunchedEffect(pendingShare) {
             if (pendingShare != null) {
                 kotlinx.coroutines.delay(7000)
@@ -557,7 +533,6 @@ fun ArScreen() {
     }
 }
 
-/** Ищем CharacterNode вверх по иерархии от той ноды, по которой попал тап. */
 private fun findCharacter(node: Node): CharacterNode? {
     var current: Node? = node
     while (current != null) {
