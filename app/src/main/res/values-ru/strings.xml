@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="onb_skip">Пропустить</string>
+    <string name="onb_next">Дальше</string>
+    <string name="onb_open_camera">Открыть камеру</string>
+    <string name="onb1_title">Персонаж в вашей комнате</string>
+    <string name="onb1_body">Наведите камеру на пол и коснитесь экрана. Персонаж встанет там, где вы указали, и останется на месте, даже если отвернуться.</string>
+    <string name="onb2_title">Любая своя модель</string>
+    <string name="onb2_body">Кнопка загрузки добавит ваш файл .glb или .gltf. Если внутри есть анимации, приложение подхватит их автоматически.</string>
+    <string name="onb3_title">Снимайте и делитесь</string>
+    <string name="onb3_body">Фото и видео сцены сохраняются в галерею одним касанием.</string>
+
+    <string name="perm_title">Нужен доступ к камере</string>
+    <string name="perm_body">Через камеру приложение находит пол и стены вашей комнаты, чтобы поставить туда персонажа. Видео никуда не отправляется.</string>
+    <string name="perm_allow">Разрешить</string>
+    <string name="perm_settings">Открыть настройки</string>
+
+    <string name="ar_unsupported_title">Устройство не поддерживает AR</string>
+    <string name="ar_unsupported_body">Для работы нужен телефон из списка ARCore-совместимых устройств Google. К сожалению, на этом аппарате приложение работать не сможет.</string>
+
+    <string name="hint_move_slowly">Медленно поводите телефоном по полу</string>
+    <string name="hint_aim">Наведите прицел на пол и коснитесь экрана</string>
+    <string name="hint_gestures">Тяните, чтобы двигать · щипок — размер · два пальца — поворот</string>
+    <string name="hint_ready">Готово</string>
+    <string name="hint_bad_state">Перезапустите приложение</string>
+    <string name="hint_dark">Слишком темно — включите свет</string>
+    <string name="hint_slow_down">Двигайте телефоном медленнее</string>
+    <string name="hint_features">Наведите на предметы, а не на пустую стену</string>
+    <string name="hint_camera_busy">Камера занята другим приложением</string>
+    <string name="hint_default">Наведите камеру на пол</string>
+
+    <string name="loading_model">Загружаем модель…</string>
+    <string name="action_undo">Отменить</string>
+    <string name="action_clear">Очистить</string>
+    <string name="action_photo">Снимок</string>
+    <string name="action_record">Записать видео</string>
+    <string name="action_import">Загрузить</string>
+    <string name="badge_recording">Запись</string>
+    <string name="show_panel">Показать панель</string>
+    <string name="animation_index">Анимация %1$d</string>
+    <string name="distance_meters">%1$.1f м</string>
+
+    <string name="char_fox">Лис</string>
+    <string name="char_human">Человек</string>
+    <string name="char_robot">Робот</string>
+    <string name="char_duck">Утка</string>
+
+    <string name="toast_no_surface">Не вижу поверхность. Поводите телефоном по полу.</string>
+    <string name="toast_limit">Больше %1$d персонажей телефон не потянет</string>
+    <string name="toast_model_failed">Модель не загрузилась. Проверьте интернет или файл.</string>
+    <string name="toast_import_ok">«%1$s» добавлен. Наведите на пол и коснитесь.</string>
+    <string name="toast_import_failed">Не удалось прочитать файл. Нужен .glb или .gltf</string>
+    <string name="toast_photo_saved">Снимок сохранён в галерею</string>
+    <string name="toast_photo_failed">Не получилось сделать снимок</string>
+    <string name="toast_save_error">Ошибка сохранения</string>
+    <string name="toast_video_saved">Видео сохранено в галерею</string>
+
+    <string name="session_error_title">AR-сессия прервалась</string>
+    <string name="session_error_retry">Попробовать снова</string>
+    <string name="session_error_generic">Не удалось запустить камеру</string>
+
+    <string name="rec_cancelled">Запись отменена</string>
+    <string name="rec_too_short">Слишком короткая запись</string>
+    <string name="rec_no_permission">Нет разрешения на запись экрана</string>
+    <string name="rec_save_failed">Не удалось сохранить видео</string>
+    <string name="rec_start_failed">Не удалось начать запись</string>
+    <string name="rec_notif_title">Идёт запись AR-сцены</string>
+    <string name="rec_notif_text">Нажмите кнопку записи в приложении, чтобы остановить</string>
+    <string name="rec_channel">Запись экрана</string>
+    <string name="coach_title">Попробуйте жесты</string>
+    <string name="coach_drag">Тяните одним пальцем, чтобы двигать</string>
+    <string name="coach_pinch">Щипок — изменить размер</string>
+    <string name="coach_rotate">Два пальца — поворот</string>
+    <string name="coach_got_it">Понятно</string>
+
+    <string name="import_err_too_big">Файл больше %1$d МБ. Уменьшите количество полигонов или размер текстур.</string>
+    <string name="import_err_not_gltf">Это не файл glTF. Экспортируйте модель как .glb из Blender.</string>
+    <string name="import_err_compressed">В модели используется сжатие %1$s, движок его не читает. Экспортируйте без сжатия.</string>
+    <string name="import_err_read">Не удалось прочитать файл.</string>
+
+    <string name="share_ready">Сохранено в галерею</string>
+    <string name="action_share">Поделиться</string>
+    <string name="share_chooser">Поделиться через</string>
+
+    <string name="delete_model_title">Убрать модель?</string>
+    <string name="delete_model_body">«%1$s» будет удалён из приложения. Исходный файл на телефоне останется на месте.</string>
+    <string name="action_delete">Удалить</string>
+    <string name="action_cancel">Отмена</string>
+    <string name="thermal_throttled">Телефон нагрелся — качество снижено</string>
+</resources>

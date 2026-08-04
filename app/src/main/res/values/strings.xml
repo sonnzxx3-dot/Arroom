@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">AR Room</string>
+
+    <!-- Onboarding -->
+    <string name="onb_skip">Skip</string>
+    <string name="onb_next">Next</string>
+    <string name="onb_open_camera">Open camera</string>
+    <string name="onb1_title">A character in your room</string>
+    <string name="onb1_body">Point the camera at the floor and tap the screen. The character stays exactly where you put it, even when you look away.</string>
+    <string name="onb2_title">Any model you like</string>
+    <string name="onb2_body">The import button adds your own .glb or .gltf file. If it contains animations, the app picks them up automatically.</string>
+    <string name="onb3_title">Capture and share</string>
+    <string name="onb3_body">Photos and videos of the scene are saved to your gallery with one tap.</string>
+
+    <!-- Camera permission -->
+    <string name="perm_title">Camera access needed</string>
+    <string name="perm_body">The app uses the camera to find the floor and walls of your room so it can place a character there. Nothing is uploaded anywhere.</string>
+    <string name="perm_allow">Allow</string>
+    <string name="perm_settings">Open settings</string>
+
+    <!-- ARCore -->
+    <string name="ar_unsupported_title">AR is not supported</string>
+    <string name="ar_unsupported_body">This app needs a phone from Google\'s list of ARCore-supported devices. Unfortunately it cannot run on this one.</string>
+
+    <!-- Hints -->
+    <string name="hint_move_slowly">Slowly move your phone across the floor</string>
+    <string name="hint_aim">Aim the reticle at the floor and tap</string>
+    <string name="hint_gestures">Drag to move · pinch to resize · two fingers to rotate</string>
+    <string name="hint_ready">Ready</string>
+    <string name="hint_bad_state">Please restart the app</string>
+    <string name="hint_dark">Too dark — turn on some light</string>
+    <string name="hint_slow_down">Move the phone more slowly</string>
+    <string name="hint_features">Point at objects, not a blank wall</string>
+    <string name="hint_camera_busy">The camera is used by another app</string>
+    <string name="hint_default">Point the camera at the floor</string>
+
+    <!-- Controls -->
+    <string name="loading_model">Loading model…</string>
+    <string name="action_undo">Undo</string>
+    <string name="action_clear">Clear all</string>
+    <string name="action_photo">Photo</string>
+    <string name="action_record">Record video</string>
+    <string name="action_import">Import</string>
+    <string name="badge_recording">Recording</string>
+    <string name="show_panel">Show controls</string>
+    <string name="animation_index">Animation %1$d</string>
+    <string name="distance_meters">%1$.1f m</string>
+
+    <!-- Demo characters -->
+    <string name="char_fox">Fox</string>
+    <string name="char_human">Human</string>
+    <string name="char_robot">Robot</string>
+    <string name="char_duck">Duck</string>
+
+    <!-- Toasts -->
+    <string name="toast_no_surface">No surface found. Sweep the phone across the floor.</string>
+    <string name="toast_limit">%1$d characters is the limit your phone can handle</string>
+    <string name="toast_model_failed">Model failed to load. Check your connection or the file.</string>
+    <string name="toast_import_ok">%1$s added. Aim at the floor and tap.</string>
+    <string name="toast_import_failed">Could not read the file. A .glb or .gltf is required.</string>
+    <string name="toast_photo_saved">Photo saved to gallery</string>
+    <string name="toast_photo_failed">Could not take the photo</string>
+    <string name="toast_save_error">Saving failed</string>
+    <string name="toast_video_saved">Video saved to gallery</string>
+
+    <!-- Session -->
+    <string name="session_error_title">AR session interrupted</string>
+    <string name="session_error_retry">Try again</string>
+    <string name="session_error_generic">Could not start the camera</string>
+
+    <!-- Recording -->
+    <string name="rec_cancelled">Recording cancelled</string>
+    <string name="rec_too_short">Recording was too short</string>
+    <string name="rec_no_permission">Screen capture was not allowed</string>
+    <string name="rec_save_failed">Could not save the video</string>
+    <string name="rec_start_failed">Could not start recording</string>
+    <string name="rec_notif_title">Recording the AR scene</string>
+    <string name="rec_notif_text">Tap the record button in the app to stop</string>
+    <string name="rec_channel">Screen recording</string>
+    <!-- Gesture coach -->
+    <string name="coach_title">Try the gestures</string>
+    <string name="coach_drag">Drag with one finger to move</string>
+    <string name="coach_pinch">Pinch to resize</string>
+    <string name="coach_rotate">Two fingers to rotate</string>
+    <string name="coach_got_it">Got it</string>
+
+    <!-- Import validation -->
+    <string name="import_err_too_big">The file is larger than %1$d MB. Reduce the polygon count or texture size.</string>
+    <string name="import_err_not_gltf">This is not a glTF file. Export the model as .glb from Blender.</string>
+    <string name="import_err_compressed">The model uses %1$s compression, which the renderer cannot read. Export it without compression.</string>
+    <string name="import_err_read">Could not read the file.</string>
+
+    <!-- Sharing -->
+    <string name="share_ready">Saved to gallery</string>
+    <string name="action_share">Share</string>
+    <string name="share_chooser">Share via</string>
+
+    <!-- Managing imported models -->
+    <string name="delete_model_title">Remove model?</string>
+    <string name="delete_model_body">%1$s will be deleted from the app. The original file on your phone stays untouched.</string>
+    <string name="action_delete">Delete</string>
+    <string name="action_cancel">Cancel</string>
+    <string name="thermal_throttled">Your phone is heating up — quality lowered</string>
+</resources>
