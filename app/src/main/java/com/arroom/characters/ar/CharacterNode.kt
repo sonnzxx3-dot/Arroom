@@ -15,29 +15,14 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlin.math.sin
 
-/**
- * Контейнер персонажа.
- *
- * Иерархия: AnchorNode (ARCore) -> CharacterNode (наши анимации) -> ModelNode (сама модель).
- * Отдельный контейнер нужен, чтобы анимировать масштаб/парение, не ломая
- * нормализацию размера, которую делает ModelNode через scaleToUnits.
- */
 class CharacterNode(
     engine: com.google.android.filament.Engine,
     val modelNode: ModelNode,
     val characterId: String
 ) : Node(engine) {
 
-    /** Базовая высота над якорем — вокруг неё качается idle-анимация. */
     private var baseY = 0f
 
-    /**
-     * Все запущенные ноды корутины. Без этого списка idle-анимация
-     * продолжает крутиться после удаления персонажа: цикл `while (isActive)`
-     * живёт ровно столько, сколько живёт scope экрана, то есть вечно.
-     * Тридцать раз в секунду он пишет в уничтоженный Filament-объект —
-     * это и утечка, и потенциальный краш.
-     */
     private val jobs = mutableListOf<Job>()
 
     var isSelected: Boolean = false
@@ -52,23 +37,24 @@ class CharacterNode(
         scale = Float3(0.001f)
     }
 
-    /** Сколько скелетных анимаций внутри glTF. */
     val animationCount: Int get() = modelNode.animator.animationCount
 
-    /** Имя анимации из glTF. null — если автор модели его не задал. */
     fun animationNameOrNull(index: Int): String? =
         runCatching { modelNode.animator.getAnimationName(index) }
             .getOrNull()
             ?.takeIf { it.isNotBlank() }
 
     fun playAnimation(index: Int, loop: Boolean = true) {
-        if (index in 0 until animationCount) {
-            modelNode.stopAnimation()
-            modelNode.playAnimation(index, loop = loop)
-        }
+        if (index !in 0 until animationCount) return
+        stopAllAnimations()
+        modelNode.playAnimation(index, loop = loop)
     }
 
-    /** Пружинистое появление «из ниоткуда» + лёгкий доворот. */
+    /** Общего stopAnimation() в API нет — гасим каждую по индексу. */
+    private fun stopAllAnimations() {
+        repeat(animationCount) { i -> runCatching { modelNode.stopAnimation(i) } }
+    }
+
     fun animateAppearance(scope: CoroutineScope, onDone: () -> Unit = {}) {
         jobs += scope.launch {
             val s = Animatable(0.001f)
@@ -81,7 +67,7 @@ class CharacterNode(
             s.animateTo(
                 targetValue = 1f,
                 animationSpec = spring(
-                    dampingRatio = 0.48f,   // ощутимый «отскок»
+                    dampingRatio = 0.48f,
                     stiffness = Spring.StiffnessLow
                 )
             ) {
@@ -91,16 +77,11 @@ class CharacterNode(
         }
     }
 
-    /** Плавное исчезновение перед удалением. */
     suspend fun animateDisappearance() {
         val s = Animatable(scale.x)
         s.animateTo(0.001f, tween(durationMillis = 260)) { scale = Float3(value) }
     }
 
-    /**
-     * Вечное лёгкое «дыхание»: подъём-спуск + медленный поворот.
-     * Работает поверх скелетной анимации glTF, не конфликтуя с ней.
-     */
     fun startIdleFloat(scope: CoroutineScope, amplitude: Float = 0.012f, spinSpeed: Float = 6f) {
         baseY = position.y
         jobs += scope.launch {
@@ -116,7 +97,6 @@ class CharacterNode(
         }
     }
 
-    /** Подсветка выбранного персонажа коротким «пульсом». */
     fun pulse(scope: CoroutineScope) {
         jobs += scope.launch {
             val s = Animatable(scale.x)
@@ -129,15 +109,10 @@ class CharacterNode(
         isSelected = selected
     }
 
-    /**
-     * Останавливает анимации и отдаёт ресурсы Filament обратно движку.
-     * Вызывать обязательно перед удалением ноды из сцены: меши и текстуры
-     * живут в нативной памяти, сборщик мусора Kotlin про них не знает.
-     */
     fun dispose() {
         jobs.forEach { it.cancel() }
         jobs.clear()
-        runCatching { modelNode.stopAnimation() }
+        runCatching { stopAllAnimations() }
         runCatching { modelNode.destroy() }
         runCatching { destroy() }
     }
@@ -157,7 +132,6 @@ class CharacterNode(
                 isShadowReceiver = true
             }
             return CharacterNode(engine, model, characterId).apply {
-                // Автостарт первой встроенной анимации, если она есть
                 if (animationCount > 0) playAnimation(0)
             }
         }
