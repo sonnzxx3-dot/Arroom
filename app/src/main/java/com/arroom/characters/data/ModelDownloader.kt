@@ -76,6 +76,13 @@ class ModelDownloader(context: Context) {
         target.absolutePath
     }
 
+    fun cacheSizeBytes(): Long =
+        cacheDir.listFiles()?.filter { it.isFile }?.sumOf { it.length() } ?: 0L
+
+    fun clearCache() {
+        cacheDir.listFiles()?.forEach { it.delete() }
+    }
+
     fun isCached(url: String): Boolean =
         File(cacheDir, keyOf(url)).let { it.exists() && it.length() > 0 }
 

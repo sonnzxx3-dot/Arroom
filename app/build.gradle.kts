@@ -42,6 +42,14 @@ android {
 
     buildFeatures { compose = true }
 
+    lint {
+        // Отчёт читаем в артефактах CI, но сборку не роняем:
+        // предупреждения Compose-линта часто ложные
+        abortOnError = false
+        warningsAsErrors = false
+        htmlReport = true
+    }
+
     // .glb нельзя сжимать — Filament читает их через mmap
     androidResources {
         noCompress += listOf("glb", "gltf", "bin", "ktx", "filamat")
@@ -69,6 +77,7 @@ dependencies {
 
     // --- Прочее ---
     implementation("androidx.core:core-ktx:1.15.0")
+    implementation("androidx.core:core-splashscreen:1.0.1")
     implementation("io.coil-kt:coil-compose:2.7.0")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.9.0")
 

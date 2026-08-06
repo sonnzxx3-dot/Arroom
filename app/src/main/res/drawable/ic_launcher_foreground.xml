@@ -3,16 +3,15 @@
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
-    <!-- Простая заглушка иконки: куб в рамке видоискателя -->
+    <!-- Изометрический куб внутри безопасной зоны адаптивной иконки.
+         Рамку видоискателя сюда не выносим: круглая маска её обрежет. -->
     <path
         android:fillColor="#8B6CFF"
-        android:pathData="M54,32 L72,42 L72,64 L54,74 L36,64 L36,42 Z" />
+        android:pathData="M29,48.5 L54,56 L54,80 L29,72.5 Z" />
+    <path
+        android:fillColor="#5C46BE"
+        android:pathData="M79,48.5 L54,56 L54,80 L79,72.5 Z" />
     <path
         android:fillColor="#3DDCFF"
-        android:pathData="M54,32 L72,42 L54,52 L36,42 Z" />
-    <path
-        android:strokeColor="#FFFFFF"
-        android:strokeWidth="2"
-        android:fillColor="#00000000"
-        android:pathData="M30,26 L26,26 L26,32 M78,26 L82,26 L82,32 M30,82 L26,82 L26,76 M78,82 L82,82 L82,76" />
+        android:pathData="M54,41 L79,48.5 L54,56 L29,48.5 Z" />
 </vector>

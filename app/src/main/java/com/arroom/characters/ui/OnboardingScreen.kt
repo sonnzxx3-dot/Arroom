@@ -24,6 +24,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.arroom.characters.R
 import com.arroom.characters.ui.theme.AccentCyan
+import com.arroom.characters.ui.theme.Tokens
 import com.arroom.characters.ui.theme.AccentViolet
 
 private data class Page(
@@ -50,7 +51,7 @@ fun OnboardingScreen(onDone: () -> Unit) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFF0B0B12))
+            .background(Tokens.Ink)
             .statusBarsPadding()
             .navigationBarsPadding()
             .padding(28.dp),
@@ -63,7 +64,7 @@ fun OnboardingScreen(onDone: () -> Unit) {
             TextButton(onClick = onDone) {
                 Text(
                     stringResource(R.string.onb_skip),
-                    color = Color(0xFF8A8A99),
+                    color = Tokens.TextTertiary,
                     fontSize = 14.sp
                 )
             }
@@ -85,7 +86,7 @@ fun OnboardingScreen(onDone: () -> Unit) {
                 Spacer(Modifier.height(34.dp))
                 Text(
                     stringResource(p.title),
-                    color = Color.White,
+                    color = Tokens.TextPrimary,
                     fontSize = 25.sp,
                     textAlign = TextAlign.Center,
                     lineHeight = 31.sp
@@ -93,7 +94,7 @@ fun OnboardingScreen(onDone: () -> Unit) {
                 Spacer(Modifier.height(14.dp))
                 Text(
                     stringResource(p.body),
-                    color = Color(0xFFA9A9B8),
+                    color = Tokens.TextSecondary,
                     fontSize = 15.sp,
                     lineHeight = 23.sp,
                     textAlign = TextAlign.Center
@@ -112,7 +113,7 @@ fun OnboardingScreen(onDone: () -> Unit) {
                         .height(7.dp)
                         .width(width)
                         .clip(RoundedCornerShape(100))
-                        .background(if (active) AccentViolet else Color(0xFF2A2A36))
+                        .background(if (active) Tokens.Violet else Tokens.Inactive)
                 )
             }
         }
@@ -125,14 +126,14 @@ fun OnboardingScreen(onDone: () -> Unit) {
                 .fillMaxWidth()
                 .height(54.dp),
             shape = RoundedCornerShape(16.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = AccentViolet)
+            colors = ButtonDefaults.buttonColors(containerColor = Tokens.Violet)
         ) {
             Text(
                 stringResource(
                     if (index == pages.lastIndex) R.string.onb_open_camera else R.string.onb_next
                 ),
                 fontSize = 16.sp,
-                color = Color.White
+                color = Tokens.TextPrimary
             )
         }
     }

@@ -102,4 +102,88 @@
     <string name="action_delete">Delete</string>
     <string name="action_cancel">Cancel</string>
     <string name="thermal_throttled">Your phone is heating up — quality lowered</string>
+    <!-- Settings -->
+    <string name="settings_title">Settings</string>
+    <string name="settings_privacy">Privacy policy</string>
+    <string name="settings_replay_coach">Show the gesture tips again</string>
+    <string name="settings_clear_cache">Clear downloaded models</string>
+    <string name="settings_cache_size">%1$.1f MB on disk</string>
+    <string name="settings_version">Version %1$s</string>
+    <string name="cache_cleared">Cache cleared</string>
+
+    <!-- Crash reporting -->
+    <string name="crash_title">The app closed unexpectedly</string>
+    <string name="crash_body">A technical report was saved on your device. Sending it helps fix the problem — nothing is sent without your confirmation.</string>
+    <string name="crash_send">Send</string>
+    <string name="crash_skip">Not now</string>
+    <string name="crash_mail_subject">AR Room crash report</string>
+
+    <!-- Replace both of these before release -->
+    <string name="support_email" translatable="false">your-email@example.com</string>
+    <string name="privacy_policy_url" translatable="false">https://example.com/privacy</string>
+    <!-- Collection -->
+    <string name="collection_title">Collection</string>
+    <string name="collection_progress">%1$d of %2$d collected</string>
+    <string name="collection_open">Collection</string>
+    <string name="tab_collection">Collection</string>
+    <string name="tab_shop">Shop</string>
+    <string name="tab_trade">Trade</string>
+    <string name="coins">Coins</string>
+    <string name="back">Back</string>
+
+    <string name="rarity_common">Common</string>
+    <string name="rarity_rare">Rare</string>
+    <string name="rarity_epic">Epic</string>
+    <string name="rarity_legendary">Legendary</string>
+
+    <string name="owned_count">You own %1$d</string>
+    <string name="card_locked">Not collected yet</string>
+    <string name="card_locked_hint">Place this character in your room to catch it</string>
+    <string name="buy_for">Buy for %1$d</string>
+    <string name="sell_for">Sell +%1$d</string>
+    <string name="not_enough_coins">Not enough coins</string>
+    <string name="favorite">Favorite</string>
+    <string name="unfavorite">Unfavorite</string>
+
+    <string name="trade_soon_title">Trading is coming</string>
+    <string name="trade_soon_body">Soon you\'ll be able to trade cards with other players for coins. This needs a server, which is on the way.</string>
+
+    <!-- Catch toasts -->
+    <string name="catch_new">New card! %1$s · +%2$d coins</string>
+    <string name="catch_dup">Duplicate · +%1$d coins</string>
+    <string name="bought_ok">%1$s added to your collection</string>
+    <string name="sold_ok">Sold · +%1$d coins</string>
+    <!-- Packs -->
+    <string name="pack_basic">Basic pack</string>
+    <string name="pack_premium">Premium pack</string>
+    <string name="pack_legendary">Legendary pack</string>
+    <string name="pack_open">Open for %1$d</string>
+    <string name="pack_got">You got %1$s!</string>
+    <string name="tab_packs">Packs</string>
+
+    <!-- Daily -->
+    <string name="daily_title">Daily reward</string>
+    <string name="daily_claim">Claim +%1$d</string>
+    <string name="daily_streak">Day streak: %1$d</string>
+    <string name="daily_claimed">+%1$d coins. Come back tomorrow!</string>
+
+    <!-- Achievements -->
+    <string name="tab_achievements">Awards</string>
+    <string name="ach_claim">Claim +%1$d</string>
+    <string name="ach_claimed">Claimed</string>
+    <string name="ach_reward_got">Achievement reward: +%1$d coins</string>
+    <string name="ach_first_title">First catch</string>
+    <string name="ach_first_desc">Catch your first character</string>
+    <string name="ach_five_title">Getting started</string>
+    <string name="ach_five_desc">Collect 5 different characters</string>
+    <string name="ach_rare_title">Rare hunter</string>
+    <string name="ach_rare_desc">Own 3 rare or better cards</string>
+    <string name="ach_epic_title">Epic</string>
+    <string name="ach_epic_desc">Own an epic card</string>
+    <string name="ach_legend_title">Legend</string>
+    <string name="ach_legend_desc">Own a legendary card</string>
+    <string name="ach_complete_title">Completionist</string>
+    <string name="ach_complete_desc">Collect every character</string>
+    <string name="pack_new_card">NEW CARD</string>
+    <string name="pack_continue">Nice</string>
 </resources>

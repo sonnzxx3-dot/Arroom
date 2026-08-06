@@ -14,17 +14,24 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.WindowCompat
 import com.arroom.characters.data.AppPrefs
 import com.arroom.characters.ui.ArCoreGate
 import com.arroom.characters.ui.ArScreen
 import com.arroom.characters.ui.CameraPermissionGate
+import com.arroom.characters.ui.CrashReportDialog
 import com.arroom.characters.ui.OnboardingScreen
 import com.arroom.characters.ui.theme.ARRoomTheme
+import com.arroom.characters.util.CrashLogger
+import com.arroom.characters.util.sendCrashReport
 
 class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        // Обязательно до super.onCreate — иначе системный сплэш
+        // не подхватится и мелькнёт чёрный кадр
+        installSplashScreen()
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         WindowCompat.setDecorFitsSystemWindows(window, false)
@@ -35,6 +42,21 @@ class MainActivity : ComponentActivity() {
             ARRoomTheme {
                 val prefs = remember { AppPrefs(this) }
                 var onboarded by remember { mutableStateOf(prefs.onboardingDone) }
+                var crashReport by remember { mutableStateOf(CrashLogger.pendingReport(this)) }
+
+                crashReport?.let { report ->
+                    CrashReportDialog(
+                        onSend = {
+                            sendCrashReport(this, report)
+                            CrashLogger.clear(this)
+                            crashReport = null
+                        },
+                        onDismiss = {
+                            CrashLogger.clear(this)
+                            crashReport = null
+                        }
+                    )
+                }
 
                 AnimatedContent(
                     targetState = onboarded,

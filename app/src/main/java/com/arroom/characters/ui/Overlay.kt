@@ -30,7 +30,9 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -43,7 +45,12 @@ import com.arroom.characters.ar.CharacterNode
 import com.arroom.characters.data.CharacterItem
 import com.arroom.characters.ui.theme.AccentCyan
 import com.arroom.characters.ui.theme.AccentViolet
+import com.arroom.characters.ui.theme.GlassIconButton
+import com.arroom.characters.ui.theme.GlassSurface
 import com.arroom.characters.ui.theme.Glass
+import com.arroom.characters.ui.theme.LocalReducedMotion
+import com.arroom.characters.ui.theme.Tokens
+import com.arroom.characters.ui.theme.pressable
 import com.google.ar.core.TrackingFailureReason
 import java.io.File
 
@@ -70,19 +77,15 @@ fun StatusHint(
         label = "hint",
         modifier = modifier
     ) { value ->
-        Box(
-            Modifier
-                .clip(RoundedCornerShape(100))
-                .background(Glass)
-                .border(1.dp, Color.White.copy(alpha = 0.12f), RoundedCornerShape(100))
-                .padding(horizontal = 18.dp, vertical = 10.dp)
-        ) {
+        GlassSurface {
             Text(
                 value,
-                color = Color.White,
+                color = Tokens.TextPrimary,
                 fontSize = 13.sp,
+                lineHeight = 18.sp,
                 textAlign = TextAlign.Center,
-                maxLines = 2
+                maxLines = 2,
+                modifier = Modifier.padding(horizontal = Tokens.Space5, vertical = Tokens.Space3)
             )
         }
     }
@@ -101,6 +104,7 @@ private fun TrackingFailureReason.hintRes(): Int = when (this) {
 
 @Composable
 fun LoadingBubble(progress: Float? = null) {
+    val reducedMotion = LocalReducedMotion.current
     val transition = rememberInfiniteTransition(label = "loader")
     val pulse by transition.animateFloat(
         initialValue = 0.92f,
@@ -111,10 +115,11 @@ fun LoadingBubble(progress: Float? = null) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
-            .scale(pulse)
-            .clip(RoundedCornerShape(22.dp))
-            .background(Glass)
-            .padding(horizontal = 26.dp, vertical = 20.dp)
+            .scale(if (reducedMotion) 1f else pulse)
+            .clip(Tokens.RadiusLg)
+            .background(Tokens.Glass)
+            .border(1.dp, Tokens.GlassStroke, Tokens.RadiusLg)
+            .padding(horizontal = Tokens.Space6, vertical = Tokens.Space5)
     ) {
         // Определённый прогресс там, где сервер сообщил размер файла,
         // и бесконечная крутилка там, где нет: врать процентами хуже,
@@ -122,13 +127,13 @@ fun LoadingBubble(progress: Float? = null) {
         if (progress != null) {
             CircularProgressIndicator(
                 progress = { progress },
-                color = AccentViolet,
+                color = Tokens.Violet,
                 strokeWidth = 3.dp,
                 modifier = Modifier.size(28.dp)
             )
         } else {
             CircularProgressIndicator(
-                color = AccentViolet,
+                color = Tokens.Violet,
                 strokeWidth = 3.dp,
                 modifier = Modifier.size(28.dp)
             )
@@ -243,19 +248,21 @@ fun ControlPanel(
  */
 @Composable
 fun PlacementReticle(ready: Boolean, distanceMeters: Float?) {
+    val reducedMotion = LocalReducedMotion.current
     val transition = rememberInfiniteTransition(label = "reticle")
-    val spin by transition.animateFloat(
+    val spinRaw by transition.animateFloat(
         initialValue = 0f,
         targetValue = 360f,
         animationSpec = infiniteRepeatable(tween(4200, easing = LinearEasing)),
         label = "spin"
     )
+    val spin = if (reducedMotion) 0f else spinRaw
     val size by animateFloatAsState(
         targetValue = if (ready) 1f else 0.82f,
         animationSpec = spring(dampingRatio = 0.5f),
         label = "reticleSize"
     )
-    val color = if (ready) AccentCyan else Color.White.copy(alpha = 0.45f)
+    val color = if (ready) Tokens.Cyan else Tokens.TextPrimary.copy(alpha = 0.45f)
 
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Canvas(
@@ -284,9 +291,9 @@ fun PlacementReticle(ready: Boolean, distanceMeters: Float?) {
         AnimatedVisibility(visible = ready && distanceMeters != null) {
             Text(
                 text = distanceMeters?.let { stringResource(R.string.distance_meters, it) } ?: "",
-                color = Color.White.copy(alpha = 0.75f),
+                color = Tokens.TextPrimary.copy(alpha = 0.75f),
                 fontSize = 11.sp,
-                modifier = Modifier.padding(top = 6.dp)
+                modifier = Modifier.padding(top = Tokens.Space2)
             )
         }
     }
@@ -298,17 +305,17 @@ fun SessionErrorOverlay(message: String, onRetry: () -> Unit) {
     Box(
         Modifier
             .fillMaxSize()
-            .background(Color(0xEE0B0B12)),
+            .background(Tokens.Ink.copy(alpha = 0.94f)),
         contentAlignment = Alignment.Center
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.padding(32.dp)
+            modifier = Modifier.padding(Tokens.Space6 + Tokens.Space2)
         ) {
             Icon(
                 Icons.Rounded.CameraAlt,
                 contentDescription = null,
-                tint = AccentViolet,
+                tint = Tokens.Violet,
                 modifier = Modifier.size(44.dp)
             )
             Spacer(Modifier.height(16.dp))
@@ -321,14 +328,14 @@ fun SessionErrorOverlay(message: String, onRetry: () -> Unit) {
             Spacer(Modifier.height(8.dp))
             Text(
                 message,
-                color = Color(0xFFA9A9B8),
+                color = Tokens.TextSecondary,
                 fontSize = 13.sp,
                 textAlign = TextAlign.Center
             )
             Spacer(Modifier.height(22.dp))
             Button(
                 onClick = onRetry,
-                colors = ButtonDefaults.buttonColors(containerColor = AccentViolet)
+                colors = ButtonDefaults.buttonColors(containerColor = Tokens.Violet)
             ) {
                 Text(stringResource(R.string.session_error_retry), color = Color.White)
             }
@@ -343,39 +350,39 @@ fun SessionErrorOverlay(message: String, onRetry: () -> Unit) {
  */
 @Composable
 fun SharePrompt(onShare: () -> Unit) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier
-            .clip(RoundedCornerShape(100))
-            .background(Glass)
-            .border(1.dp, Color.White.copy(0.14f), RoundedCornerShape(100))
-            .padding(start = 16.dp, end = 6.dp, top = 6.dp, bottom = 6.dp)
-    ) {
-        Icon(
-            Icons.Rounded.CheckCircle,
-            contentDescription = null,
-            tint = AccentCyan,
-            modifier = Modifier.size(17.dp)
-        )
-        Spacer(Modifier.width(8.dp))
-        Text(stringResource(R.string.share_ready), color = Color.White, fontSize = 12.sp)
-        Spacer(Modifier.width(12.dp))
+    val shareLabel = stringResource(R.string.action_share)
+    GlassSurface {
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier
-                .clip(RoundedCornerShape(100))
-                .background(AccentViolet)
-                .clickable(onClick = onShare)
-                .padding(horizontal = 14.dp, vertical = 7.dp)
+            modifier = Modifier.padding(start = Tokens.Space4, end = Tokens.Space1, top = Tokens.Space1, bottom = Tokens.Space1)
         ) {
             Icon(
-                Icons.Rounded.Share,
+                Icons.Rounded.CheckCircle,
                 contentDescription = null,
-                tint = Color.White,
-                modifier = Modifier.size(15.dp)
+                tint = Tokens.Success,
+                modifier = Modifier.size(Tokens.IconSm)
             )
-            Spacer(Modifier.width(6.dp))
-            Text(stringResource(R.string.action_share), color = Color.White, fontSize = 12.sp)
+            Spacer(Modifier.width(Tokens.Space2))
+            Text(stringResource(R.string.share_ready), color = Tokens.TextPrimary, fontSize = 12.sp)
+            Spacer(Modifier.width(Tokens.Space3))
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .clip(Tokens.RadiusPill)
+                    .background(Tokens.AccentGradient)
+                    .semantics { contentDescription = shareLabel; role = Role.Button }
+                    .pressable(onClick = onShare)
+                    .padding(horizontal = Tokens.Space4, vertical = Tokens.Space2)
+            ) {
+                Icon(
+                    Icons.Rounded.Share,
+                    contentDescription = null,
+                    tint = Tokens.TextPrimary,
+                    modifier = Modifier.size(Tokens.IconSm)
+                )
+                Spacer(Modifier.width(Tokens.Space2))
+                Text(stringResource(R.string.action_share), color = Tokens.TextPrimary, fontSize = 12.sp)
+            }
         }
     }
 }
@@ -413,21 +420,24 @@ fun RecordingBadge() {
         animationSpec = infiniteRepeatable(tween(650), RepeatMode.Reverse),
         label = "recAlpha"
     )
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier
-            .clip(RoundedCornerShape(100))
-            .background(Glass)
-            .padding(horizontal = 12.dp, vertical = 7.dp)
-    ) {
-        Box(
-            Modifier
-                .size(9.dp)
-                .clip(CircleShape)
-                .background(Color(0xFFE2504A).copy(alpha = alpha))
-        )
-        Spacer(Modifier.width(7.dp))
-        Text(stringResource(R.string.badge_recording), color = Color.White, fontSize = 12.sp)
+    GlassSurface {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.padding(horizontal = Tokens.Space3, vertical = Tokens.Space2)
+        ) {
+            Box(
+                Modifier
+                    .size(9.dp)
+                    .clip(CircleShape)
+                    .background(Tokens.Recording.copy(alpha = alpha))
+            )
+            Spacer(Modifier.width(Tokens.Space2))
+            Text(
+                stringResource(R.string.badge_recording),
+                color = Tokens.TextPrimary,
+                fontSize = 12.sp
+            )
+        }
     }
 }
 
@@ -438,18 +448,18 @@ private fun RecordButton(isRecording: Boolean, onClick: () -> Unit) {
     Box(
         contentAlignment = Alignment.Center,
         modifier = Modifier
-            .semantics { contentDescription = label }
-            .size(48.dp)
+            .semantics { contentDescription = label; role = Role.Button }
+            .size(Tokens.TouchMin)
             .clip(CircleShape)
-            .background(Glass)
-            .border(1.dp, Color.White.copy(0.14f), CircleShape)
-            .clickable(onClick = onClick)
+            .background(Tokens.Glass)
+            .border(1.dp, Tokens.GlassStroke, CircleShape)
+            .pressable(onClick = onClick)
     ) {
         Box(
             Modifier
                 .size(22.dp * size)
                 .clip(if (isRecording) RoundedCornerShape(4.dp) else CircleShape)
-                .background(Color(0xFFE2504A))
+                .background(Tokens.Recording)
         )
     }
 }
@@ -469,17 +479,17 @@ private fun AnimationChips(
             val active = index == current
             Box(
                 Modifier
-                    .clip(RoundedCornerShape(100))
-                    .background(if (active) AccentViolet else Glass)
-                    .clickable {
-                        current = index
-                        onPick(index)
-                    }
-                    .padding(horizontal = 14.dp, vertical = 8.dp)
+                    .clip(Tokens.RadiusPill)
+                    .then(
+                        if (active) Modifier.background(Tokens.AccentGradient)
+                        else Modifier.background(Tokens.Glass).border(1.dp, Tokens.GlassStroke, Tokens.RadiusPill)
+                    )
+                    .pressable(onClick = { current = index; onPick(index) })
+                    .padding(horizontal = Tokens.Space4, vertical = Tokens.Space2)
             ) {
                 Text(
                     nameOf(index) ?: stringResource(R.string.animation_index, index + 1),
-                    color = Color.White,
+                    color = Tokens.TextPrimary,
                     fontSize = 12.sp,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
@@ -512,7 +522,7 @@ private fun CharacterTile(
                 .border(
                     width = if (isSelected) 2.dp else 1.dp,
                     brush = if (isSelected)
-                        Brush.linearGradient(listOf(AccentViolet, AccentCyan))
+                        Tokens.AccentGradient
                     else Brush.linearGradient(
                         listOf(Color.White.copy(0.15f), Color.White.copy(0.05f))
                     ),
@@ -550,7 +560,7 @@ private fun CharacterTile(
         Spacer(Modifier.height(6.dp))
         Text(
             item.title,
-            color = if (isSelected) Color.White else Color.White.copy(0.65f),
+            color = if (isSelected) Tokens.TextPrimary else Tokens.TextSecondary,
             fontSize = 11.sp,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
@@ -575,9 +585,7 @@ private fun ImportTile(onClick: () -> Unit) {
                 .size(64.dp)
                 .clip(RoundedCornerShape(20.dp))
                 .background(
-                    Brush.linearGradient(
-                        listOf(AccentViolet.copy(0.9f), AccentCyan.copy(0.75f))
-                    )
+                    Tokens.AccentGradient
                 )
                 .clickable(onClick = onClick)
         ) {
@@ -607,55 +615,62 @@ private fun RoundAction(
     enabled: Boolean,
     onClick: () -> Unit
 ) {
-    val alpha by animateFloatAsState(if (enabled) 1f else 0.35f, label = "actionAlpha")
-    Box(
-        contentAlignment = Alignment.Center,
-        modifier = Modifier
-            .size(48.dp)
-            .clip(CircleShape)
-            .background(Glass)
-            .clickable(enabled = enabled, onClick = onClick)
-    ) {
-        Icon(
-            icon,
-            contentDescription = label,
-            tint = Color.White.copy(alpha = alpha),
-            modifier = Modifier.size(22.dp)
-        )
+    GlassIconButton(onClick = onClick, contentDescription = label, enabled = enabled) {
+        Icon(icon, contentDescription = null, modifier = Modifier.size(Tokens.IconMd))
     }
 }
 
 @Composable
 private fun ShutterButton(onClick: () -> Unit) {
-    var pressed by remember { mutableStateOf(false) }
-    val scale by animateFloatAsState(
-        targetValue = if (pressed) 0.9f else 1f,
-        animationSpec = spring(dampingRatio = 0.4f),
-        label = "shutter"
-    )
-    LaunchedEffect(pressed) {
-        if (pressed) {
-            kotlinx.coroutines.delay(120)
-            pressed = false
-        }
-    }
+    val label = stringResource(R.string.action_photo)
     Box(
         contentAlignment = Alignment.Center,
         modifier = Modifier
-            .size(72.dp)
-            .scale(scale)
+            .size(Tokens.Shutter)
             .clip(CircleShape)
-            .background(Brush.linearGradient(listOf(AccentViolet, AccentCyan)))
-            .clickable {
-                pressed = true
-                onClick()
-            }
+            .background(Tokens.AccentGradient)
+            .semantics { contentDescription = label; role = Role.Button }
+            .pressable(onClick = onClick, pressScale = 0.9f)
     ) {
         Icon(
             Icons.Rounded.PhotoCamera,
-            contentDescription = stringResource(R.string.action_photo),
-            tint = Color.White,
+            contentDescription = null,
+            tint = Tokens.TextPrimary,
             modifier = Modifier.size(30.dp)
         )
+    }
+}
+
+/** Кнопка входа в коллекцию с бейджем монет. Ставится в шапке AR-экрана. */
+@Composable
+fun CollectionButton(coins: Int, onClick: () -> Unit) {
+    GlassSurface(
+        modifier = Modifier.pressable(onClick = onClick)
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.padding(start = Tokens.Space3, end = Tokens.Space3, top = 9.dp, bottom = 9.dp)
+        ) {
+            Icon(
+                Icons.Rounded.Style,
+                contentDescription = stringResource(R.string.collection_open),
+                tint = Tokens.TextPrimary,
+                modifier = Modifier.size(Tokens.IconSm)
+            )
+            Spacer(Modifier.width(Tokens.Space2))
+            Icon(
+                Icons.Rounded.Paid,
+                contentDescription = null,
+                tint = androidx.compose.ui.graphics.Color(0xFFFFB020),
+                modifier = Modifier.size(14.dp)
+            )
+            Spacer(Modifier.width(2.dp))
+            Text(
+                "$coins",
+                color = androidx.compose.ui.graphics.Color(0xFFFFB020),
+                fontSize = 13.sp,
+                fontWeight = androidx.compose.ui.text.font.FontWeight.Bold
+            )
+        }
     }
 }

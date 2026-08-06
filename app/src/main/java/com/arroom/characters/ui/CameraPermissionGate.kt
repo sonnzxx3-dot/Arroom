@@ -22,6 +22,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import com.arroom.characters.R
+import com.arroom.characters.ui.theme.Tokens
 
 /**
  * Камера — единственное обязательное разрешение.
@@ -58,7 +59,7 @@ fun CameraPermissionGate(content: @Composable () -> Unit) {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFF0B0B12)),
+            .background(Tokens.Ink),
         contentAlignment = Alignment.Center
     ) {
         Column(
@@ -68,20 +69,20 @@ fun CameraPermissionGate(content: @Composable () -> Unit) {
             Icon(
                 Icons.Rounded.CameraAlt,
                 contentDescription = null,
-                tint = MaterialTheme.colorScheme.primary,
+                tint = Tokens.Violet,
                 modifier = Modifier.size(56.dp)
             )
             Spacer(Modifier.height(20.dp))
             Text(
                 stringResource(R.string.perm_title),
                 style = MaterialTheme.typography.headlineSmall,
-                color = Color.White
+                color = Tokens.TextPrimary
             )
             Spacer(Modifier.height(10.dp))
             Text(
                 stringResource(R.string.perm_body),
                 style = MaterialTheme.typography.bodyMedium,
-                color = Color(0xFFB9B9C6),
+                color = Tokens.TextSecondary,
                 textAlign = TextAlign.Center
             )
             Spacer(Modifier.height(28.dp))

@@ -18,6 +18,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import com.arroom.characters.R
+import com.arroom.characters.ui.theme.Tokens
 import com.google.ar.core.ArCoreApk
 
 private enum class ArState { CHECKING, READY, INSTALLING, UNSUPPORTED }
@@ -88,7 +89,7 @@ fun ArCoreGate(content: @Composable () -> Unit) {
         )
 
         else -> Box(
-            Modifier.fillMaxSize().background(Color(0xFF0B0B12)),
+            Modifier.fillMaxSize().background(Tokens.Ink),
             contentAlignment = Alignment.Center
         ) {
             CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
@@ -99,7 +100,7 @@ fun ArCoreGate(content: @Composable () -> Unit) {
 @Composable
 private fun FullScreenMessage(title: String, body: String) {
     Box(
-        Modifier.fillMaxSize().background(Color(0xFF0B0B12)),
+        Modifier.fillMaxSize().background(Tokens.Ink),
         contentAlignment = Alignment.Center
     ) {
         Column(
@@ -109,16 +110,16 @@ private fun FullScreenMessage(title: String, body: String) {
             Icon(
                 Icons.Rounded.ErrorOutline,
                 contentDescription = null,
-                tint = MaterialTheme.colorScheme.primary,
+                tint = Tokens.Violet,
                 modifier = Modifier.size(52.dp)
             )
             Spacer(Modifier.height(18.dp))
-            Text(title, style = MaterialTheme.typography.headlineSmall, color = Color.White)
+            Text(title, style = MaterialTheme.typography.headlineSmall, color = Tokens.TextPrimary)
             Spacer(Modifier.height(10.dp))
             Text(
                 body,
                 style = MaterialTheme.typography.bodyMedium,
-                color = Color(0xFFB9B9C6),
+                color = Tokens.TextSecondary,
                 textAlign = TextAlign.Center
             )
         }

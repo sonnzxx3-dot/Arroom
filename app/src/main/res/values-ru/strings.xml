@@ -87,4 +87,77 @@
     <string name="action_delete">Удалить</string>
     <string name="action_cancel">Отмена</string>
     <string name="thermal_throttled">Телефон нагрелся — качество снижено</string>
+    <string name="settings_title">Настройки</string>
+    <string name="settings_privacy">Политика конфиденциальности</string>
+    <string name="settings_replay_coach">Показать подсказки про жесты</string>
+    <string name="settings_clear_cache">Очистить скачанные модели</string>
+    <string name="settings_cache_size">%1$.1f МБ на диске</string>
+    <string name="settings_version">Версия %1$s</string>
+    <string name="cache_cleared">Кеш очищен</string>
+
+    <string name="crash_title">Приложение неожиданно закрылось</string>
+    <string name="crash_body">Технический отчёт сохранён на устройстве. Его отправка помогает исправить проблему — без вашего подтверждения ничего не уходит.</string>
+    <string name="crash_send">Отправить</string>
+    <string name="crash_skip">Не сейчас</string>
+    <string name="crash_mail_subject">Отчёт о сбое AR Room</string>
+    <string name="collection_title">Коллекция</string>
+    <string name="collection_progress">Собрано %1$d из %2$d</string>
+    <string name="collection_open">Коллекция</string>
+    <string name="tab_collection">Коллекция</string>
+    <string name="tab_shop">Магазин</string>
+    <string name="tab_trade">Обмен</string>
+    <string name="coins">Монеты</string>
+    <string name="back">Назад</string>
+
+    <string name="rarity_common">Обычная</string>
+    <string name="rarity_rare">Редкая</string>
+    <string name="rarity_epic">Эпическая</string>
+    <string name="rarity_legendary">Легендарная</string>
+
+    <string name="owned_count">В коллекции: %1$d</string>
+    <string name="card_locked">Ещё не поймана</string>
+    <string name="card_locked_hint">Поставьте персонажа в комнату, чтобы поймать</string>
+    <string name="buy_for">Купить за %1$d</string>
+    <string name="sell_for">Продать +%1$d</string>
+    <string name="not_enough_coins">Не хватает монет</string>
+    <string name="favorite">В избранное</string>
+    <string name="unfavorite">Из избранного</string>
+
+    <string name="trade_soon_title">Обмен скоро появится</string>
+    <string name="trade_soon_body">Скоро вы сможете обменивать карточки с другими игроками за монеты. Для этого нужен сервер — он в разработке.</string>
+
+    <string name="catch_new">Новая карточка! %1$s · +%2$d монет</string>
+    <string name="catch_dup">Дубликат · +%1$d монет</string>
+    <string name="bought_ok">«%1$s» добавлен в коллекцию</string>
+    <string name="sold_ok">Продано · +%1$d монет</string>
+    <string name="pack_basic">Обычный набор</string>
+    <string name="pack_premium">Премиум-набор</string>
+    <string name="pack_legendary">Легендарный набор</string>
+    <string name="pack_open">Открыть за %1$d</string>
+    <string name="pack_got">Вам выпал %1$s!</string>
+    <string name="tab_packs">Наборы</string>
+
+    <string name="daily_title">Ежедневная награда</string>
+    <string name="daily_claim">Забрать +%1$d</string>
+    <string name="daily_streak">Серия дней: %1$d</string>
+    <string name="daily_claimed">+%1$d монет. Заходите завтра!</string>
+
+    <string name="tab_achievements">Награды</string>
+    <string name="ach_claim">Забрать +%1$d</string>
+    <string name="ach_claimed">Получено</string>
+    <string name="ach_reward_got">Награда за достижение: +%1$d монет</string>
+    <string name="ach_first_title">Первая поимка</string>
+    <string name="ach_first_desc">Поймайте первого персонажа</string>
+    <string name="ach_five_title">Начало положено</string>
+    <string name="ach_five_desc">Соберите 5 разных персонажей</string>
+    <string name="ach_rare_title">Охотник за редким</string>
+    <string name="ach_rare_desc">Имейте 3 редких карты или выше</string>
+    <string name="ach_epic_title">Эпик</string>
+    <string name="ach_epic_desc">Заведите эпическую карту</string>
+    <string name="ach_legend_title">Легенда</string>
+    <string name="ach_legend_desc">Заведите легендарную карту</string>
+    <string name="ach_complete_title">Коллекционер</string>
+    <string name="ach_complete_desc">Соберите всех персонажей</string>
+    <string name="pack_new_card">НОВАЯ КАРТА</string>
+    <string name="pack_continue">Отлично</string>
 </resources>
