@@ -10,7 +10,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.ripple.rememberRipple
+import androidx.compose.material3.ripple
 import androidx.compose.foundation.clickable
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -49,7 +49,7 @@ fun Modifier.pressable(
         .scale(scale)
         .clickable(
             interactionSource = interaction,
-            indication = rememberRipple(bounded = false),
+            indication = ripple(bounded = false),
             enabled = enabled,
             role = role,
             onClick = onClick
