@@ -4,6 +4,7 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
@@ -27,14 +28,6 @@ import com.arroom.characters.ui.theme.pressable
 
 private enum class Tab { COLLECTION, SHOP, PACKS, ACHIEVEMENTS, TRADE }
 
-/**
- * Дом коллекционной части. Пять вкладок:
- *  - Коллекция: всё, что поймано, плюс силуэты ненайденного
- *  - Магазин: купить карточку за монеты
- *  - Наборы: паки со случайным выпадением
- *  - Награды: достижения
- *  - Обмен: торговля между людьми (пока витрина-заглушка, ждёт сервер)
- */
 @Composable
 fun CollectionScreen(
     cards: List<Card>,
@@ -64,7 +57,6 @@ fun CollectionScreen(
             .background(Tokens.Ink)
             .statusBarsPadding()
     ) {
-        // --- Шапка: назад, прогресс, кошелёк ---
         Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
@@ -98,7 +90,6 @@ fun CollectionScreen(
             CoinBadge(wallet.coins)
         }
 
-        // Полоса прогресса коллекции
         val pct by animateFloatAsState(
             if (total == 0) 0f else owned.toFloat() / total,
             label = "progress"
@@ -120,7 +111,6 @@ fun CollectionScreen(
             )
         }
 
-        // --- Ежедневная награда ---
         if (dailyAvailable) {
             DailyRewardBanner(
                 amount = dailyAmount,
@@ -130,7 +120,6 @@ fun CollectionScreen(
             )
         }
 
-        // --- Вкладки ---
         LazyRow(
             contentPadding = PaddingValues(horizontal = Tokens.Space4, vertical = Tokens.Space4),
             horizontalArrangement = Arrangement.spacedBy(Tokens.Space2),
@@ -162,7 +151,6 @@ fun CollectionScreen(
         }
     }
 
-    // --- Детальный лист карточки ---
     selected?.let { card ->
         CardDetailSheet(
             card = card,
